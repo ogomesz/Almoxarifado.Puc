@@ -36,9 +36,6 @@ internal class Estoque
 
             //ira adicionar a list de movimentação essa entrada 
             historico.Add(h1);
-
-
-
         }
 
     }
