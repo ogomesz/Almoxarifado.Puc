@@ -76,7 +76,7 @@ A base de dados foi mapeada para o modelo físico relacional e conta com 5 tabel
      dotnet run
      ```
    - Para testar o primeiro acesso, utilize o login padrão:
-     - **Login**: `admin`
+     - **Login**: `Adm`
      - **Senha**: `123`
 
 ---
