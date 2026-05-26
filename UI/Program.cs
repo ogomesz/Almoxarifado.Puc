@@ -125,13 +125,7 @@ internal sealed class Almoxarifado
     private static void MenuEstoque()
     {
         Estoque estoquePuc = new Estoque();
-<<<<<<< HEAD
         estoquePuc.SetUsuarioLogado(IdUsuarioLogado); 
-=======
-        
-        estoquePuc.SetUsuarioLogado(IdUsuarioLogado); 
-        
->>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
         int opcao;
 
         do
@@ -163,7 +157,6 @@ internal sealed class Almoxarifado
                     Console.Write("Digite o nome do produto: ");
                     string nome = Console.ReadLine();
 
-<<<<<<< HEAD
                     Console.WriteLine("Categorias: [1] Informática | [2] Papelaria | [3] Limpeza | [4] Operações | [5] Jardinagem");
                     Console.Write("Digite o ID da categoria: ");
                     string categoria = Console.ReadLine(); 
@@ -174,14 +167,6 @@ internal sealed class Almoxarifado
 
                     Produto novoProduto = new Produto(id, nome, categoria, fornecedor);
 
-=======
-                    Console.WriteLine("Categorias: [1] Informática | [2] Papelaria");
-                    Console.Write("Digite o ID da categoria do produto: ");
-                    string categoria = Console.ReadLine(); 
-
-                    Produto novoProduto = new Produto(id, nome, categoria);
-
->>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
                     Console.WriteLine("");
                     if (estoquePuc.Cadastrar(novoProduto))
                     {
@@ -259,8 +244,4 @@ internal sealed class Almoxarifado
             }
         } while (opcao != 0);
     }
-<<<<<<< HEAD
 }
-=======
-}   
->>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
