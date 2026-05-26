@@ -1,128 +1,241 @@
+using System;
+using MySql.Data.MySqlClient;
+
 internal class Estoque
 {
-    //List criada para armazenar os produtos no obejto criado "produtos"
-    private List<Produto> produtos = new List<Produto>();
+    private ConexaoBD bd = new ConexaoBD();
+    private int idUsuarioLogado;
 
-    //Nova list de movimentação (ira exibir o historico de retirada)
-    private List<Movimentacao> historico = new List<Movimentacao>();
-
-
-    //metodo sem retorno que tem como parametro o tipo Produto com o objeto p1
-    public void Cadastrar(Produto p1)
+    public void SetUsuarioLogado(int id)
     {
-        //o obejeto criado na list<> adiciona o valor de p1 a List<>
-        produtos.Add(p1);
+        idUsuarioLogado = id;
     }
 
-    //criado o metodo de registrar a entrada do produto com parametro de id e quantidade
-    public void RegistrarEntrada(int id, int qtd)
+    public bool Cadastrar(Produto p1)
     {
-        //usa o Tipo da list<> e cria uma variavel para armazenar o id que foi encontrado  para verificar se o id fornecido foi encontrado 
-        Produto pEncontrado = BuscarPorCodigo(id);
-
-        //se o valor mensionado for "null" ele exibe que o produto nao foi encontrado 
-        if (pEncontrado == null)
+        using (MySqlConnection con = bd.Conectar())
         {
-            System.Console.WriteLine("Produto não encontrado! ");
+            if (con == null) return false;
 
-        }
-        else
-        {
-            //se não o objeto ira chamar o metodo de AdicionarEstoque e armazenar a quantidade 
-            pEncontrado.AdicionarEstoque(qtd);
-
-            //se o produto for encontrado ira fazer a movimentação de ENTRADA de produtos(ira adicionar), o nome a quantidade e Tipo (entrada ou saida) e a data da entrada
-            Movimentacao h1 = new Movimentacao(pEncontrado.NomeProduto, qtd, "ENTRADA", DateTime.Now);
-
-            //ira adicionar a list de movimentação essa entrada 
-            historico.Add(h1);
-
-
-
-        }
-
-    }
-
-    //metodo sem retorno que Lista os produtos
-    public void LisarTudo()
-    {
-
-        //Ira percorrer item por item e exibir o Nome, Id e Estoque de cada produto. 
-        foreach (Produto item in produtos)
-        {
-            //apos percorrer os produtos da lista chama o metodo exibir e mostar na tela o Id nome e quantidade em estoque
-            item.Exibir();
-        }
-    }
-
-    //cria o metodo de retorno Produto (obejto da List<>) e passa por parametro o id para buscar pelo id na lista
-    public Produto BuscarPorCodigo(int id)
-    {
-        //percorre a List<> atras do id 
-        foreach (Produto item in produtos)
-        {
-            //se o codigoID (padrao) for igual ao codigo inserido retorna o item (id) encontrado 
-            if (item.CodigoID == id)
+            string checkSql = "SELECT COUNT(*) FROM Produto WHERE codigo_id = @CodigoID";
+            using (MySqlCommand checkCmd = new MySqlCommand(checkSql, con))
             {
-                return item;
+                checkCmd.Parameters.AddWithValue("@CodigoID", p1.CodigoID);
+                int count = Convert.ToInt32(checkCmd.ExecuteScalar());
+
+                if (count > 0)
+                {
+                    Console.WriteLine("Erro: Já existe um produto cadastrado com este ID!");
+                    return false;
+                }
             }
 
+            string insertSql = "INSERT INTO Produto (codigo_id, nome_produto, id_categoria, id_fornecedor, quantidade_estoque) " +
+                               "VALUES (@CodigoID, @Nome, @Categoria, @Fornecedor, @Quantidade)";
+            
+            using (MySqlCommand insertCmd = new MySqlCommand(insertSql, con))
+            {
+                insertCmd.Parameters.AddWithValue("@CodigoID", p1.CodigoID);
+                insertCmd.Parameters.AddWithValue("@Nome", p1.NomeProduto);
+                insertCmd.Parameters.AddWithValue("@Categoria", int.Parse(p1.Categoria));
+                insertCmd.Parameters.AddWithValue("@Fornecedor", int.Parse(p1.Fornecedor)); 
+                insertCmd.Parameters.AddWithValue("@Quantidade", p1.QuantidadeEstoque);
+
+                int linhasAfetadas = insertCmd.ExecuteNonQuery();
+                return linhasAfetadas > 0;
+            }
         }
-        //se não retorna valor null (ausencia de objeto \ id (item))
+    }
+
+    public Produto BuscarPorCodigo(int id)
+    {
+        using (MySqlConnection con = bd.Conectar())
+        {
+            if (con == null) return null;
+
+            string sql = @"SELECT p.codigo_id, p.nome_produto, c.nome_categoria, f.nome_fantasia, p.quantidade_estoque 
+                           FROM Produto p 
+                           JOIN Categoria c ON p.id_categoria = c.id_categoria 
+                           JOIN Fornecedor f ON p.id_fornecedor = f.id_fornecedor
+                           WHERE p.codigo_id = @id";
+
+            using (MySqlCommand cmd = new MySqlCommand(sql, con))
+            {
+                cmd.Parameters.AddWithValue("@id", id);
+
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        Produto p = new Produto(
+                            reader.GetInt32("codigo_id"),
+                            reader.GetString("nome_produto"),
+                            reader.GetString("nome_categoria"),
+                            reader.GetString("nome_fantasia") 
+                        );
+                        
+                        p.AdicionarEstoque(reader.GetInt32("quantidade_estoque")); 
+                        return p;
+                    }
+                }
+            }
+        }
         return null;
     }
 
-    //metodo para registrar a saida do item buscando pelo id
-    public void RegistrarSaida(int id, int qtd)
+    public void LisarTudo()
     {
-        //variavel do tipo Produto 
-        Produto encontrado;
-
-        //usa o metodo de buscar o produto ja criada
-        //armazena o Produto em uma variavel que foi criada a partir do tipo (onde esta armazenado os produtos )
-        BuscarPorCodigo(id);
-        encontrado = BuscarPorCodigo(id);
-
-        //verifica se o produto existe
-        if (encontrado == null)
+        using (MySqlConnection con = bd.Conectar())
         {
-            //se nao existir exibe essa mensagem -
-            System.Console.WriteLine("Produto inexistente! ");
+            if (con == null) return;
 
-        }
-        else
-        {
-            //se nao verifica se a quantidade de produto solicitada é maior que o estoque 
-            if (encontrado.QuantidadeEstoque >= qtd)
+            string sql = @"SELECT p.codigo_id, p.nome_produto, c.nome_categoria, f.nome_fantasia, p.quantidade_estoque 
+                           FROM Produto p 
+                           JOIN Categoria c ON p.id_categoria = c.id_categoria
+                           JOIN Fornecedor f ON p.id_fornecedor = f.id_fornecedor";
+
+            using (MySqlCommand cmd = new MySqlCommand(sql, con))
+            using (MySqlDataReader reader = cmd.ExecuteReader())
             {
-                // se suim usa o produto encontrado com a variavel "encontrado" e chama o metodo com a quantidade solicitada como parametro
-                encontrado.RemoverEstoque(qtd);
+                bool temRegistros = false;
+                while (reader.Read())
+                {
+                    temRegistros = true;
+                    Console.WriteLine($"Cod: {reader["codigo_id"]} | {reader["nome_produto"]} | " +
+                                      $"Categoria: {reader["nome_categoria"]} | Fornecedor: {reader["nome_fantasia"]} | Quantidade: {reader["quantidade_estoque"]}");
+                }
 
-                //aqui eu passo por parametro o nome do produto encontrado, a quantidade que foi passada por parametro no metodo de Saida, o nome de SAIDA que ira indicar a saida e o horario 
-                Movimentacao h1 = new Movimentacao(encontrado.NomeProduto, qtd, "SAIDA", DateTime.Now);
-
-                //e aqui eu adiciono essa movimentação na lista de historico 
-                historico.Add(h1);
-            }
-            // se nao ira exibir a mensagem de estoque insuficiente 
-            else
-            {
-                System.Console.WriteLine("Saldo Insuficiente! ");
-
-
+                if (!temRegistros)
+                {
+                    Console.WriteLine("Nenhum produto cadastrado no momento.");
+                }
             }
         }
-
-
     }
 
-    //esta dentro do escopo onde pode ser acessado a List de tipo Movimentação
+    public void ExcluirProduto(int id)
+    {
+        using (MySqlConnection con = bd.Conectar())
+        {
+            if (con == null) return;
+
+            string sql = "DELETE FROM Produto WHERE codigo_id = @id";
+            using (MySqlCommand cmd = new MySqlCommand(sql, con))
+            {
+                cmd.Parameters.AddWithValue("@id", id);
+                int linhasAfetadas = cmd.ExecuteNonQuery();
+
+                if (linhasAfetadas > 0)
+                {
+                    Console.WriteLine("Produto excluído com sucesso!");
+                }
+                else
+                {
+                    Console.WriteLine("Erro: Produto não encontrado para exclusão!");
+                }
+            }
+        }
+    }
+
+    public void RegistrarEntrada(int id, int qtd)
+    {
+        using (MySqlConnection con = bd.Conectar())
+        {
+            if (con == null) return;
+
+            string updateSql = "UPDATE Produto SET quantidade_estoque = quantidade_estoque + @qtd WHERE codigo_id = @id";
+            using (MySqlCommand updateCmd = new MySqlCommand(updateSql, con))
+            {
+                updateCmd.Parameters.AddWithValue("@qtd", qtd);
+                updateCmd.Parameters.AddWithValue("@id", id);
+                int afetadas = updateCmd.ExecuteNonQuery();
+
+                if (afetadas == 0)
+                {
+                    Console.WriteLine("Produto inexistente!");
+                    return;
+                }
+            }
+
+            string insertMov = "INSERT INTO Movimentacao (codigo_id, id_usuario, quantidade, tipo) VALUES (@id, @id_user, @qtd, 'ENTRADA')";
+            using (MySqlCommand movCmd = new MySqlCommand(insertMov, con))
+            {
+                movCmd.Parameters.AddWithValue("@id", id);
+                movCmd.Parameters.AddWithValue("@id_user", idUsuarioLogado);
+                movCmd.Parameters.AddWithValue("@qtd", qtd);
+                movCmd.ExecuteNonQuery();
+            }
+            Console.WriteLine("Entrada efetuada com sucesso!");
+        }
+    }
+
+    public void RegistrarSaida(int id, int qtd)
+    {
+        Produto encontrado = BuscarPorCodigo(id);
+
+        if (encontrado == null)
+        {
+            Console.WriteLine("Produto inexistente!");
+            return;
+        }
+
+        if (encontrado.QuantidadeEstoque < qtd)
+        {
+            Console.WriteLine("Saldo Insuficiente!");
+            return;
+        }
+
+        using (MySqlConnection con = bd.Conectar())
+        {
+            if (con == null) return;
+
+            string updateSql = "UPDATE Produto SET quantidade_estoque = quantidade_estoque - @qtd WHERE codigo_id = @id";
+            using (MySqlCommand updateCmd = new MySqlCommand(updateSql, con))
+            {
+                updateCmd.Parameters.AddWithValue("@qtd", qtd);
+                updateCmd.Parameters.AddWithValue("@id", id);
+                updateCmd.ExecuteNonQuery();
+            }
+
+            string insertMov = "INSERT INTO Movimentacao (codigo_id, id_usuario, quantidade, tipo) VALUES (@id, @id_user, @qtd, 'SAIDA')";
+            using (MySqlCommand movCmd = new MySqlCommand(insertMov, con))
+            {
+                movCmd.Parameters.AddWithValue("@id", id);
+                movCmd.Parameters.AddWithValue("@id_user", idUsuarioLogado);
+                movCmd.Parameters.AddWithValue("@qtd", qtd);
+                movCmd.ExecuteNonQuery();
+            }
+            Console.WriteLine("Saída efetuada com sucesso!");
+        }
+    }
+
     public void ExibirHistotico()
     {
-        foreach (Movimentacao item in historico)
+        using (MySqlConnection con = bd.Conectar())
         {
-            //uso a variavel que percorre e armazena o produto e exibo 
-            item.Exibir();
+            if (con == null) return;
+
+            string sql = @"SELECT m.quantidade, m.tipo, m.data_hora, p.nome_produto 
+                           FROM Movimentacao m
+                           JOIN Produto p ON m.codigo_id = p.codigo_id
+                           ORDER BY m.data_hora DESC";
+
+            using (MySqlCommand cmd = new MySqlCommand(sql, con))
+            using (MySqlDataReader reader = cmd.ExecuteReader())
+            {
+                bool temRegistros = false;
+                while (reader.Read())
+                {
+                    temRegistros = true;
+                    DateTime data = reader.GetDateTime("data_hora");
+                    Console.WriteLine($"{reader["nome_produto"]} | QTD: {reader["quantidade"]} - {reader["tipo"]} - {data}");
+                }
+
+                if (!temRegistros)
+                {
+                    Console.WriteLine("Nenhuma movimentação registrada no histórico.");
+                }
+            }
         }
     }
 }

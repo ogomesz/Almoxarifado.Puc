@@ -1,129 +1,247 @@
-﻿internal sealed class Almoxarifado
+﻿using System;
+using MySql.Data.MySqlClient;
+
+internal sealed class Almoxarifado
 {
+    public static int IdUsuarioLogado { get; private set; } = 0;
+
     public static void Main()
     {
-        //criacao do objeto estoquePuc que ira servir para chamar os metodos do Produto 
+        bool autenticado = false;
+
+        while (!autenticado)
+        {
+            Console.WriteLine("\n=== SISTEMA DE ALMOXARIFADO ===");
+            Console.WriteLine("1 - Fazer Login");
+            Console.WriteLine("2 - Cadastrar Novo Usuário");
+            Console.WriteLine("0 - Sair");
+            Console.Write("Escolha uma opção: ");
+            
+            string op = Console.ReadLine();
+
+            if (op == "1")
+            {
+                autenticado = FazerLogin();
+            }
+            else if (op == "2")
+            {
+                CadastrarUsuario();
+            }
+            else if (op == "0")
+            {
+                Console.WriteLine("Encerrando...");
+                return;
+            }
+            else
+            {
+                Console.WriteLine("Opção inválida!");
+            }
+        }
+
+        MenuEstoque();
+    }
+
+    private static bool FazerLogin()
+    {
+        Console.Write("\nLogin: ");
+        string login = Console.ReadLine();
+        
+        Console.Write("Senha: ");
+        string senha = Console.ReadLine();
+
+        ConexaoBD bd = new ConexaoBD();
+        using (MySqlConnection con = bd.Conectar())
+        {
+            if (con == null) return false;
+
+            string sql = "SELECT id_usuario, nome FROM Usuario WHERE login = @login AND senha = @senha";
+            using (MySqlCommand cmd = new MySqlCommand(sql, con))
+            {
+                cmd.Parameters.AddWithValue("@login", login);
+                cmd.Parameters.AddWithValue("@senha", senha); 
+
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read()) 
+                    {
+                        IdUsuarioLogado = reader.GetInt32("id_usuario");
+                        string nome = reader.GetString("nome");
+                        
+                        Console.WriteLine($"\nAcesso Liberado! Bem-vindo(a), {nome}.");
+                        return true; 
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nErro: Login ou senha incorretos.");
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
+    private static void CadastrarUsuario()
+    {
+        Console.Write("\nDigite o seu Nome completo: ");
+        string nome = Console.ReadLine();
+
+        Console.Write("Crie um Login de acesso: ");
+        string login = Console.ReadLine();
+
+        Console.Write("Crie uma Senha: ");
+        string senha = Console.ReadLine();
+
+        ConexaoBD bd = new ConexaoBD();
+        using (MySqlConnection con = bd.Conectar())
+        {
+            if (con == null) return;
+
+            string checkSql = "SELECT COUNT(*) FROM Usuario WHERE login = @login";
+            using (MySqlCommand checkCmd = new MySqlCommand(checkSql, con))
+            {
+                checkCmd.Parameters.AddWithValue("@login", login);
+                if (Convert.ToInt32(checkCmd.ExecuteScalar()) > 0)
+                {
+                    Console.WriteLine("Erro: Este login já está em uso por outra pessoa.");
+                    return;
+                }
+            }
+
+            string insertSql = "INSERT INTO Usuario (nome, login, senha) VALUES (@nome, @login, @senha)";
+            using (MySqlCommand cmd = new MySqlCommand(insertSql, con))
+            {
+                cmd.Parameters.AddWithValue("@nome", nome);
+                cmd.Parameters.AddWithValue("@login", login);
+                cmd.Parameters.AddWithValue("@senha", senha);
+
+                if (cmd.ExecuteNonQuery() > 0)
+                {
+                    Console.WriteLine("Usuário cadastrado com sucesso! Use a opção 1 para logar.");
+                }
+            }
+        }
+    }
+
+    private static void MenuEstoque()
+    {
         Estoque estoquePuc = new Estoque();
-        //variavel usada para usar no switch
+        estoquePuc.SetUsuarioLogado(IdUsuarioLogado); 
         int opcao;
 
         do
         {
-            System.Console.WriteLine("");
-            System.Console.WriteLine("========== MENU ==========");
-            System.Console.WriteLine("");
-            System.Console.WriteLine("1 - CADASTRAR PRODUTO. ");
-            System.Console.WriteLine("2 - REGISTRAR ENTRADA. ");
-            System.Console.WriteLine("3 - REGISTRAR SAIDA. ");
-            System.Console.WriteLine("4 - LISTAR TUDO. ");
-            System.Console.WriteLine("5 - VER HISTORICO. ");
-            System.Console.WriteLine("6 - BUSCAR PRODUTO. ");
-            System.Console.WriteLine("7 - SAIDA (APERTE 0). ");
-            System.Console.WriteLine("");
-            System.Console.WriteLine("==========================");
+            Console.WriteLine("\n========== MENU ==========");
+            Console.WriteLine("1 - CADASTRAR PRODUTO.");
+            Console.WriteLine("2 - REGISTRAR ENTRADA.");
+            Console.WriteLine("3 - REGISTRAR SAIDA.");
+            Console.WriteLine("4 - LISTAR TUDO.");
+            Console.WriteLine("5 - VER HISTORICO.");
+            Console.WriteLine("6 - BUSCAR PRODUTO.");
+            Console.WriteLine("7 - EXCLUIR PRODUTO.");
+            Console.WriteLine("0 - SAIR DO SISTEMA.");
+            Console.WriteLine("==========================");
 
-            opcao = int.Parse(Console.ReadLine());
+            if (!int.TryParse(Console.ReadLine(), out opcao))
+            {
+                Console.WriteLine("Entrada inválida. Digite um número.");
+                continue;
+            }
+
             switch (opcao)
             {
                 case 1:
-
-                    System.Console.WriteLine("");
-                    //ira pedir ao usuario para digitar o id do produto 
+                    Console.WriteLine("");
                     Console.Write("Digite o ID do produto: ");
                     int id = int.Parse(Console.ReadLine());
 
-                    //ira pedir para o usuario digitar o nome do produto 
                     Console.Write("Digite o nome do produto: ");
                     string nome = Console.ReadLine();
 
-                    // Aqui você cria o objeto com os dados que o usuário digitou
-                    Produto novoProduto = new Produto(id, nome);
+                    Console.WriteLine("Categorias: [1] Informática | [2] Papelaria | [3] Limpeza | [4] Operações | [5] Jardinagem");
+                    Console.Write("Digite o ID da categoria: ");
+                    string categoria = Console.ReadLine(); 
 
-                    System.Console.WriteLine("");
-                    // Agora você passa o objeto para o estoque que ira cadastralo pelo metodo criado no Estoque
-                    estoquePuc.Cadastrar(novoProduto);
+                    Console.WriteLine("Fornecedores: [1] Port | [2] Dell | [3] BrasPrint | [4] Minas Ferramentas | [5] Mercado Livre | [6] Climpo");
+                    Console.Write("Digite o ID do fornecedor: ");
+                    string fornecedor = Console.ReadLine(); 
 
-                    Console.WriteLine("Produto cadastrado com sucesso!");
-                    //encerra o programa e volta para o MENU
+                    Produto novoProduto = new Produto(id, nome, categoria, fornecedor);
+
+                    Console.WriteLine("");
+                    if (estoquePuc.Cadastrar(novoProduto))
+                    {
+                        Console.WriteLine("Produto cadastrado com sucesso!");
+                    }
                     break;
 
-
                 case 2:
-                    System.Console.WriteLine("");
-                    System.Console.Write("Digite o ID do produto. ");
+                    Console.WriteLine("");
+                    Console.Write("Digite o ID do produto: ");
                     int IdEntrada = int.Parse(Console.ReadLine());
 
-                    System.Console.Write("Digite a quantidade do produto. ");
+                    Console.Write("Digite a quantidade de entrada: ");
                     int qtdEntrada = int.Parse(Console.ReadLine());
 
                     estoquePuc.RegistrarEntrada(IdEntrada, qtdEntrada);
-                    System.Console.Write("Lançamento efetuado! ");
                     break;
 
                 case 3:
-                    System.Console.WriteLine("");
-                    System.Console.Write("Digite o ID do produto. ");
+                    Console.WriteLine("");
+                    Console.Write("Digite o ID do produto: ");
                     int IdSaida = int.Parse(Console.ReadLine());
 
-                    System.Console.Write("Digite a quantidade do produto. ");
+                    Console.Write("Digite a quantidade de saida: ");
                     int qtdSaida = int.Parse(Console.ReadLine());
 
                     estoquePuc.RegistrarSaida(IdSaida, qtdSaida);
-                    System.Console.Write("Saida realizada! ");
                     break;
 
                 case 4:
-                    System.Console.WriteLine("");
+                    Console.WriteLine("");
                     estoquePuc.LisarTudo();
                     break;
 
                 case 5:
-                    System.Console.WriteLine("");
+                    Console.WriteLine("");
                     estoquePuc.ExibirHistotico();
                     break;
 
                 case 6:
-                    System.Console.WriteLine("");
+                    Console.WriteLine("");
                     Console.Write("Digite o ID que deseja buscar: ");
-                    // Captura o ID que foi inserido 
                     int idBusca = int.Parse(Console.ReadLine());
 
-                    //pega o tipo da List + objeto = objeto2.Metodo(variavel que armazenou o valor digitado )
                     Produto encontrado = estoquePuc.BuscarPorCodigo(idBusca);
 
-                    //Se encontrado diferente de inexistente 
                     if (encontrado != null)
                     {
-                        //o id encontrado ira exibir 
                         Console.WriteLine("\n--- Produto Encontrado ---");
-                        // Usa o método que você já criou!
                         encontrado.Exibir();
                     }
                     else
                     {
-                        //se nao exibe essa msg
                         Console.WriteLine("Erro: Produto com este ID não foi localizado.");
                     }
                     break;
 
+                case 7:
+                    Console.WriteLine("");
+                    Console.Write("Digite o ID do produto que deseja excluir: ");
+                    int idExclusao = int.Parse(Console.ReadLine());
+                    
+                    estoquePuc.ExcluirProduto(idExclusao);
+                    break;
 
                 case 0:
-                    System.Console.WriteLine("");
-                    System.Console.WriteLine("Sistema encerrado.....");
+                    Console.WriteLine("");
+                    Console.WriteLine("Sistema encerrado.....");
                     break;
 
                 default:
-                    System.Console.WriteLine("");
-                    System.Console.WriteLine("Opção invalida! ");
+                    Console.WriteLine("");
+                    Console.WriteLine("Opção invalida! ");
                     break;
-
-
             }
         } while (opcao != 0);
-
-
     }
 }
-
-
-
