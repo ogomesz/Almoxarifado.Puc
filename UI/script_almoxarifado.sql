@@ -3,16 +3,27 @@ DROP DATABASE IF EXISTS almoxarifado_db;
 CREATE DATABASE almoxarifado_db;
 USE almoxarifado_db;
 
+<<<<<<< HEAD
 -- 2. CRIAÇÃO DAS TABELAS
+=======
+-- 2. CRIAÇÃO DAS TABELAS (A estrutura física)
+
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
 CREATE TABLE Categoria (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
     nome_categoria VARCHAR(100) NOT NULL
 );
 
+<<<<<<< HEAD
 CREATE TABLE Fornecedor (
     id_fornecedor INT AUTO_INCREMENT PRIMARY KEY,
     nome_fantasia VARCHAR(150) NOT NULL,
     cnpj VARCHAR(18) UNIQUE NOT NULL
+=======
+CREATE TABLE Setor (
+    id_setor INT AUTO_INCREMENT PRIMARY KEY,
+    nome_setor VARCHAR(100) NOT NULL
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
 );
 
 CREATE TABLE Usuario (
@@ -26,10 +37,15 @@ CREATE TABLE Produto (
     codigo_id INT PRIMARY KEY,
     nome_produto VARCHAR(150) NOT NULL,
     id_categoria INT,
+<<<<<<< HEAD
     id_fornecedor INT,
     quantidade_estoque INT DEFAULT 0,
     FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria),
     FOREIGN KEY (id_fornecedor) REFERENCES Fornecedor(id_fornecedor)
+=======
+    quantidade_estoque INT DEFAULT 0,
+    FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria)
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
 );
 
 CREATE TABLE Movimentacao (
@@ -44,7 +60,11 @@ CREATE TABLE Movimentacao (
 );
 
 -- =======================================================
+<<<<<<< HEAD
 -- 3. MASSA DE DADOS PARA TESTES
+=======
+-- 3. MASSA DE DADOS PARA TESTES (Rode para testar as consultas)
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
 -- =======================================================
 
 -- Inserindo Categorias Padrão
@@ -52,6 +72,7 @@ INSERT INTO Categoria (nome_categoria) VALUES
 ('Informática'),
 ('Papelaria'),
 ('Limpeza'),
+<<<<<<< HEAD
 ('Operações'),
 ('Jardinagem');
 
@@ -78,8 +99,46 @@ INSERT INTO Produto (codigo_id, nome_produto, id_categoria, id_fornecedor, quant
 (301, 'Desinfetante 5L', 3, 6, 30);
 
 -- Inserindo Histórico Inicial
+=======
+('Mobiliário');
+
+-- Inserindo Setores
+INSERT INTO Setor (nome_setor) VALUES 
+('TI - Suporte'),
+('Administrativo'),
+('Recursos Humanos');
+
+-- Inserindo Usuários Padrão (Senha sem criptografia conforme C#)
+INSERT INTO Usuario (nome, login, senha) VALUES 
+('Administrador', 'admin', '123'),
+('João Silva', 'joao.silva', 'senha123'),
+('Maria Souza', 'maria.souza', 'senha123');
+
+-- Inserindo Produtos Fictícios
+INSERT INTO Produto (codigo_id, nome_produto, id_categoria, quantidade_estoque) VALUES 
+(101, 'Mouse sem fio', 1, 150),
+(102, 'Teclado Mecânico', 1, 80),
+(201, 'Caderno Universitário', 2, 200),
+(202, 'Caixa de Caneta Azul', 2, 60),
+(301, 'Desinfetante 5L', 3, 30);
+
+-- Inserindo Movimentações Fictícias no Histórico
+-- Entradas
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
 INSERT INTO Movimentacao (codigo_id, id_usuario, quantidade, tipo, data_hora) VALUES 
 (101, 1, 150, 'ENTRADA', '2026-05-10 09:00:00'),
 (102, 1, 80, 'ENTRADA', '2026-05-10 09:15:00'),
 (201, 2, 200, 'ENTRADA', '2026-05-11 10:30:00'),
+<<<<<<< HEAD
 (101, 2, 5, 'SAIDA', '2026-05-15 14:00:00');
+=======
+(202, 2, 60, 'ENTRADA', '2026-05-11 10:45:00'),
+(301, 3, 30, 'ENTRADA', '2026-05-12 08:20:00');
+
+-- Saídas (Consumo)
+INSERT INTO Movimentacao (codigo_id, id_usuario, quantidade, tipo, data_hora) VALUES 
+(101, 2, 5, 'SAIDA', '2026-05-15 14:00:00'),
+(201, 3, 10, 'SAIDA', '2026-05-16 11:10:00'),
+(202, 2, 2, 'SAIDA', '2026-05-18 16:40:00'),
+(101, 1, 2, 'SAIDA', '2026-05-20 09:30:00');
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc

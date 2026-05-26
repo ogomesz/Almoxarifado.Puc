@@ -30,15 +30,23 @@ internal class Estoque
                 }
             }
 
+<<<<<<< HEAD
             string insertSql = "INSERT INTO Produto (codigo_id, nome_produto, id_categoria, id_fornecedor, quantidade_estoque) " +
                                "VALUES (@CodigoID, @Nome, @Categoria, @Fornecedor, @Quantidade)";
+=======
+            string insertSql = "INSERT INTO Produto (codigo_id, nome_produto, id_categoria, quantidade_estoque) " +
+                               "VALUES (@CodigoID, @Nome, @Categoria, @Quantidade)";
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
             
             using (MySqlCommand insertCmd = new MySqlCommand(insertSql, con))
             {
                 insertCmd.Parameters.AddWithValue("@CodigoID", p1.CodigoID);
                 insertCmd.Parameters.AddWithValue("@Nome", p1.NomeProduto);
                 insertCmd.Parameters.AddWithValue("@Categoria", int.Parse(p1.Categoria));
+<<<<<<< HEAD
                 insertCmd.Parameters.AddWithValue("@Fornecedor", int.Parse(p1.Fornecedor)); 
+=======
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
                 insertCmd.Parameters.AddWithValue("@Quantidade", p1.QuantidadeEstoque);
 
                 int linhasAfetadas = insertCmd.ExecuteNonQuery();
@@ -53,10 +61,16 @@ internal class Estoque
         {
             if (con == null) return null;
 
+<<<<<<< HEAD
             string sql = @"SELECT p.codigo_id, p.nome_produto, c.nome_categoria, f.nome_fantasia, p.quantidade_estoque 
                            FROM Produto p 
                            JOIN Categoria c ON p.id_categoria = c.id_categoria 
                            JOIN Fornecedor f ON p.id_fornecedor = f.id_fornecedor
+=======
+            string sql = @"SELECT p.codigo_id, p.nome_produto, c.nome_categoria, p.quantidade_estoque 
+                           FROM Produto p 
+                           JOIN Categoria c ON p.id_categoria = c.id_categoria 
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
                            WHERE p.codigo_id = @id";
 
             using (MySqlCommand cmd = new MySqlCommand(sql, con))
@@ -70,8 +84,12 @@ internal class Estoque
                         Produto p = new Produto(
                             reader.GetInt32("codigo_id"),
                             reader.GetString("nome_produto"),
+<<<<<<< HEAD
                             reader.GetString("nome_categoria"),
                             reader.GetString("nome_fantasia") 
+=======
+                            reader.GetString("nome_categoria")
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
                         );
                         
                         p.AdicionarEstoque(reader.GetInt32("quantidade_estoque")); 
@@ -89,10 +107,16 @@ internal class Estoque
         {
             if (con == null) return;
 
+<<<<<<< HEAD
             string sql = @"SELECT p.codigo_id, p.nome_produto, c.nome_categoria, f.nome_fantasia, p.quantidade_estoque 
                            FROM Produto p 
                            JOIN Categoria c ON p.id_categoria = c.id_categoria
                            JOIN Fornecedor f ON p.id_fornecedor = f.id_fornecedor";
+=======
+            string sql = @"SELECT p.codigo_id, p.nome_produto, c.nome_categoria, p.quantidade_estoque 
+                           FROM Produto p 
+                           JOIN Categoria c ON p.id_categoria = c.id_categoria";
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
 
             using (MySqlCommand cmd = new MySqlCommand(sql, con))
             using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -102,7 +126,11 @@ internal class Estoque
                 {
                     temRegistros = true;
                     Console.WriteLine($"Cod: {reader["codigo_id"]} | {reader["nome_produto"]} | " +
+<<<<<<< HEAD
                                       $"Categoria: {reader["nome_categoria"]} | Fornecedor: {reader["nome_fantasia"]} | Quantidade: {reader["quantidade_estoque"]}");
+=======
+                                      $"Categoria: {reader["nome_categoria"]} | Quantidade: {reader["quantidade_estoque"]}");
+>>>>>>> cd80aa7e159c5e19cc0c9af4c968f0d0b6b6e6dc
                 }
 
                 if (!temRegistros)
