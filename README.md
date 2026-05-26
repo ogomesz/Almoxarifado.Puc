@@ -1,38 +1,90 @@
-# 📦 Sistema de Gestão de Almoxarifado - Parte 1
+# 📦 Sistema de Gestão de Almoxarifado
 
-Este projeto nasceu de uma observação prática no meu dia a dia de trabalho na **PUC Minas (Campus Betim)**. Percebi que o controle de estoque ainda seguia processos manuais (papel e planilhas isoladas), o que gerava lentidão e riscos de erro. Como estudante de Sistemas de Informação, decidi desenvolver esta aplicação em **C#** para automatizar e profissionalizar esse gerenciamento.
-
-## 🚀 Status do Projeto: Parte 1 Concluída
-Nesta primeira etapa, o foco foi a construção de uma base sólida utilizando os pilares da **Programação Orientada a Objetos (POO)** e uma arquitetura organizada e protegida.
+Este projeto nasceu de uma observação prática no cotidiano de trabalho na PUC Minas (Campus Betim). A percepção de que o controle de estoque seguia processos manuais (papel e planilhas isoladas), gerando lentidão e riscos de inconsistência, motivou o desenvolvimento desta aplicação em C# como estudante de Sistemas de Informação, com o objetivo de automatizar, proteger e profissionalizar esse gerenciamento.
 
 ---
 
-## 🏗️ Arquitetura e Organização
-O código foi dividido em camadas para facilitar a manutenção e futuras expansões (como a implementação de uma interface Web):
+## 🚀 Status do Projeto: Partes 1, 2 e 3 Concluídas!
 
-* **`Models/`**: Contém as entidades principais (`Produto` e `Movimentacao`). Utiliza modificadores de acesso `internal` e propriedades com `private set` para garantir o encapsulamento.
-* **`Services/`**: Camada de lógica de negócio (`Estoque`), responsável por gerenciar as listas dinâmicas, realizar buscas e processar entradas/saídas.
-* **`UI/`**: Interface de linha de comando (CLI) interativa, utilizando uma estrutura de loop `do-while` e `switch case`.
+O software evoluiu de um protótipo em memória para uma aplicação de console robusta, com barreira de segurança, tratamento rigoroso de dados e persistência real utilizando banco de dados relacional.
+
+---
+
+## 🏗️ Arquitetura e Organização do Sistema
+
+O código segue os princípios de separação de responsabilidades e forte encapsulamento da Programação Orientada a Objetos (POO), garantindo manutenibilidade e preparando o terreno para futuras expansões (como uma transição para Web API):
+
+- **`Models/` (`Produto.cs`, `Movimentacao.cs`)**: Entidades principais do sistema. Utilizam modificadores de acesso `internal` e propriedades com `private set` para assegurar o encapsulamento estrito.
+- **`Persistence/` (`ConexaoBD.cs`)**: Centraliza o ciclo de vida da conexão com o motor MySQL através do driver nativo (`MySql.Data`).
+- **`Services/` (`Estoque.cs`)**: Camada de persistência de dados e regras de negócio. Substituiu o armazenamento em listas dinâmicas por execuções de comandos SQL nativos (CRUD, controle de transações lógicas de entrada/saída e histórico).
+- **`UI/` (`Program.cs`)**: Interface de Linha de Comando (CLI) interativa. Gerencia as rotas do sistema via estruturas de repetição e barreiras de controle de fluxo.
+
+---
 
 ## 🛠️ Funcionalidades Implementadas
-- [x] Cadastro de produtos com ID único.
-- [x] Registro de entrada de mercadorias.
-- [x] Registro de saída com validação de saldo insuficiente.
-- [x] Histórico detalhado de movimentações (com data e hora).
-- [x] Listagem geral de estoque.
-- [x] Busca rápida de produtos por código.
+
+### 🔒 Segurança e Acesso
+- **Autenticação de Usuários**: Fluxo completo de login e criação de novas contas direto no terminal.
+- **Sessão Protegida**: Vinculação automática do ID do usuário logado a cada movimentação de estoque para fins de auditoria.
+
+### 📦 Gerenciamento de Estoque (CRUD no Banco de Dados)
+- **Cadastro de Produtos**: Inserção com validação de ID único e integridade referencial com a tabela de categorias.
+- **Busca Avançada**: Consulta rápida de itens por código identificador, realizando junções (`JOIN`) para trazer o nome textual da categoria.
+- **Listagem Geral**: Relatório instantâneo de todos os produtos do almoxarifado direto do banco de dados.
+- **Exclusão Física**: Remoção de registros do estoque com tratamento no banco.
+
+### 📊 Fluxo de Movimentações
+- **Registro de Entrada**: Incremento de saldo com geração automática de log histórico.
+- **Registro de Saída com Validação**: Bloqueio de retiradas caso o saldo em estoque seja insuficiente, prevenindo inconsistências.
+- **Histórico Auditável**: Relatório cronológico de todas as operações (`ENTRADA` / `SAIDA`), explicitando quantidade, produto e data/hora do evento.
+
+### 🛡️ Robustez e Resiliência (Parte 2)
+- **Tratamento de Exceções**: Uso de `try-catch` para capturar falhas críticas de infraestrutura (como queda de conexão com o banco).
+- **Validação de Inputs**: Substituição de leituras inseguras por `int.TryParse`, blindando o sistema contra quebras caso o usuário digite letras em campos numéricos.
+
+---
+
+## 💾 Estrutura do Banco de Dados
+
+A base de dados foi mapeada para o modelo físico relacional e conta com 5 tabelas interligadas:
+1. `Categoria`: Organização de grupos de produtos.
+2. `Setor`: Mapeamento dos setores da instituição.
+3. `Usuario`: Armazenamento de credenciais e nomes dos operadores.
+4. `Produto`: Registro de itens e saldos.
+5. `Movimentacao`: Histórico detalhado de fluxo do almoxarifado.
+
+---
+
+## 🔧 Como Executar o Projeto
+
+### Pré-requisitos
+- .NET SDK (versão 6.0 ou superior)
+- MySQL Server (rodando localmente na porta 3306)
+- IDE de sua preferência (VS Code ou Visual Studio)
+
+### Passos para Configuração
+1. **Configurar o Banco de Dados**:
+   - Abra o seu gerenciador MySQL (ex: MySQL Workbench).
+   - Execute o script contido no arquivo `script_almoxarifado.sql` para criar a estrutura das tabelas e popular a massa de testes.
+
+2. **Ajustar a Conexão (Se necessário)**:
+   - Verifique os parâmetros de servidor, usuário e senha dentro da classe `ConexaoBD.cs`.
+
+3. **Rodar a Aplicação**:
+   - No terminal da pasta raiz do projeto, execute o comando:
+     ```bash
+     dotnet run
+     ```
+   - Para testar o primeiro acesso, utilize o login padrão:
+     - **Login**: `admin`
+     - **Senha**: `123`
+
+---
 
 ## 📈 Roadmap de Evolução
-- [ ] **Parte 2:** Implementação de tratamento de exceções (`try-catch` / `TryParse`) e validações de dados.
-- [ ] **Parte 3:** Persistência de dados com Banco de Dados SQL.
-- [ ] **Parte 4:** Desenvolvimento de interface Web (HTML, CSS e JavaScript) e Deploy.
 
----
-
-## 💻 Tecnologias Utilizadas
-* Linguagem: **C#**
-* Plataforma: **.NET**
-* Ambiente: **VS Code / Visual Studio**
-
----
-**Desenvolvido por Eric Gomes Cordeiro** *Estudante de Sistemas de Informação - PUC Minas*
+- [x] **Parte 1**: Estrutura orientada a objetos e fluxo CLI em memória.
+- [x] **Parte 2**: Tratamento de exceções e validação de dados de entrada.
+- [x] **Parte 3**: Persistência física com Banco de Dados SQL (MySQL).
+- [ ] **Parte 4**: Consultas de conjuntos avançadas e refinamento da documentação.
+- [ ] **Parte 5**: Transição da arquitetura para Web API (ASP.NET Core) e interface gráfica.
