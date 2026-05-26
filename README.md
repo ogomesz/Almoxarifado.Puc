@@ -48,7 +48,7 @@ O código segue os princípios de separação de responsabilidades e forte encap
 
 A base de dados foi mapeada para o modelo físico relacional e conta com 5 tabelas interligadas:
 1. `Categoria`: Organização de grupos de produtos.
-2. `Setor`: Mapeamento dos setores da instituição.
+2. `Fornecedor`: Mapeamento dos fornecedores.
 3. `Usuario`: Armazenamento de credenciais e nomes dos operadores.
 4. `Produto`: Registro de itens e saldos.
 5. `Movimentacao`: Histórico detalhado de fluxo do almoxarifado.
