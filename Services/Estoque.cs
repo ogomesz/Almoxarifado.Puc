@@ -152,7 +152,7 @@ internal class Estoque
                 }
                 catch (MySqlException)
                 {
-                    // O C# segura o erro do MySQL aqui!
+                   
                     Console.WriteLine("\n[ BLOQUEIO DE INTEGRIDADE ]");
                     Console.WriteLine("Você não pode excluir este produto porque ele já possui movimentações (Entradas/Saídas) no histórico.");
                     Console.WriteLine("Para manter a auditoria do almoxarifado correta, itens com histórico não podem ser apagados.");
