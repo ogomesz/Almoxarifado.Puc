@@ -30,13 +30,18 @@ internal class Estoque
                 }
             }
 
-            string insertSql = "INSERT INTO Produto (codigo_id, nome_produto, id_categoria, id_fornecedor, quantidade_estoque) " +
-                               "VALUES (@CodigoID, @Nome, @Categoria, @Fornecedor, @Quantidade)";
+            // CORREÇÃO 1: Adicionando 'descricao' na lista de colunas e '@Descricao' nos valores
+            string insertSql = "INSERT INTO Produto (codigo_id, nome_produto, descricao, id_categoria, id_fornecedor, quantidade_estoque) " +
+                               "VALUES (@CodigoID, @Nome, @Descricao, @Categoria, @Fornecedor, @Quantidade)";
             
             using (MySqlCommand insertCmd = new MySqlCommand(insertSql, con))
             {
                 insertCmd.Parameters.AddWithValue("@CodigoID", p1.CodigoID);
                 insertCmd.Parameters.AddWithValue("@Nome", p1.NomeProduto);
+                
+                // CORREÇÃO 2: Passando o valor da descrição do objeto para o banco de dados
+                insertCmd.Parameters.AddWithValue("@Descricao", p1.Descricao); 
+                
                 insertCmd.Parameters.AddWithValue("@Categoria", int.Parse(p1.Categoria));
                 insertCmd.Parameters.AddWithValue("@Fornecedor", int.Parse(p1.Fornecedor)); 
                 insertCmd.Parameters.AddWithValue("@Quantidade", p1.QuantidadeEstoque);
@@ -70,6 +75,7 @@ internal class Estoque
                         Produto p = new Produto(
                             reader.GetInt32("codigo_id"),
                             reader.GetString("nome_produto"),
+                            reader.GetString("descricao"),
                             reader.GetString("nome_categoria"),
                             reader.GetString("nome_fantasia") 
                         );
@@ -234,6 +240,46 @@ internal class Estoque
                 if (!temRegistros)
                 {
                     Console.WriteLine("Nenhuma movimentação registrada no histórico.");
+                }
+            }
+        }
+    }
+
+    public void BuscarProduto(int idProduto)
+    {
+        using (MySqlConnection con = bd.Conectar())
+        {
+            if (con == null) return;
+            
+            // Fazemos um JOIN para trazer não só a descrição, mas os nomes da Categoria e Fornecedor
+            string sql = @"
+                SELECT p.codigo_id, p.nome_produto, p.descricao, p.quantidade_estoque, 
+                       c.nome_categoria, f.nome_fantasia
+                FROM Produto p
+                JOIN Categoria c ON p.id_categoria = c.id_categoria
+                JOIN Fornecedor f ON p.id_fornecedor = f.id_fornecedor
+                WHERE p.codigo_id = @id";
+
+            using (MySqlCommand cmd = new MySqlCommand(sql, con))
+            {
+                cmd.Parameters.AddWithValue("@id", idProduto);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        Console.WriteLine("\n=== FICHA DO PRODUTO ===");
+                        Console.WriteLine($"Código ID  : {reader["codigo_id"]}");
+                        Console.WriteLine($"Nome       : {reader["nome_produto"]}");
+                        Console.WriteLine($"Descrição  : {reader["descricao"]}");
+                        Console.WriteLine($"Categoria  : {reader["nome_categoria"]}");
+                        Console.WriteLine($"Fornecedor : {reader["nome_fantasia"]}");
+                        Console.WriteLine($"Em Estoque : {reader["quantidade_estoque"]} unidades");
+                        Console.WriteLine("========================");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Erro: Produto não encontrado no banco de dados.");
+                    }
                 }
             }
         }
