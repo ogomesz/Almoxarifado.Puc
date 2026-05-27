@@ -167,7 +167,7 @@ internal sealed class Almoxarifado
                     Console.Write("Digite o ID da categoria: ");
                     string categoria = Console.ReadLine();
 
-                    Console.WriteLine("Fornecedores: [1] Port | [2] Dell | [3] BrasPrint | [4] Minas Ferramentas | [5] Mercado Livre | [6] Climpo");
+                    Console.WriteLine("Fornecedores: [1] Port | [2] Climpo | [3] Dell| [4] BrasPrint  | [5] Minas Ferramentas | [6] Mercado Livre");
                     Console.Write("Digite o ID do fornecedor: ");
                     string fornecedor = Console.ReadLine();
 

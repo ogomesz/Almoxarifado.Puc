@@ -58,7 +58,7 @@ internal class Estoque
         {
             if (con == null) return null;
 
-            string sql = @"SELECT p.codigo_id, p.nome_produto, c.nome_categoria, f.nome_fantasia, p.quantidade_estoque 
+            string sql = @"SELECT p.codigo_id, p.nome_produto, p.descricao, c.nome_categoria, f.nome_fantasia, p.quantidade_estoque 
                            FROM Produto p 
                            JOIN Categoria c ON p.id_categoria = c.id_categoria 
                            JOIN Fornecedor f ON p.id_fornecedor = f.id_fornecedor
@@ -68,21 +68,29 @@ internal class Estoque
             {
                 cmd.Parameters.AddWithValue("@id", id);
 
-                using (MySqlDataReader reader = cmd.ExecuteReader())
+                try 
                 {
-                    if (reader.Read())
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        Produto p = new Produto(
-                            reader.GetInt32("codigo_id"),
-                            reader.GetString("nome_produto"),
-                            reader.GetString("descricao"),
-                            reader.GetString("nome_categoria"),
-                            reader.GetString("nome_fantasia") 
-                        );
-                        
-                        p.AdicionarEstoque(reader.GetInt32("quantidade_estoque")); 
-                        return p;
+                        if (reader.Read())
+                        {
+                            // Usando ToString() para blindar o C# contra valores Nulos antigos do banco!
+                            Produto p = new Produto(
+                                Convert.ToInt32(reader["codigo_id"]),
+                                reader["nome_produto"].ToString(),
+                                reader["descricao"].ToString(), 
+                                reader["nome_categoria"].ToString(),
+                                reader["nome_fantasia"].ToString() 
+                            );
+                            
+                            p.AdicionarEstoque(Convert.ToInt32(reader["quantidade_estoque"])); 
+                            return p;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"\nErro no banco ao tentar buscar o produto: {ex.Message}");
                 }
             }
         }
@@ -119,7 +127,7 @@ internal class Estoque
         }
     }
 
-    public void ExcluirProduto(int id)
+  public void ExcluirProduto(int id)
     {
         using (MySqlConnection con = bd.Conectar())
         {
@@ -129,15 +137,30 @@ internal class Estoque
             using (MySqlCommand cmd = new MySqlCommand(sql, con))
             {
                 cmd.Parameters.AddWithValue("@id", id);
-                int linhasAfetadas = cmd.ExecuteNonQuery();
+                
+                try 
+                {
+                    int linhasAfetadas = cmd.ExecuteNonQuery();
 
-                if (linhasAfetadas > 0)
-                {
-                    Console.WriteLine("Produto excluído com sucesso!");
+                    if (linhasAfetadas > 0)
+                    {
+                        Console.WriteLine("Produto excluído com sucesso!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Aviso: Produto não encontrado para exclusão!");
+                    }
                 }
-                else
+                catch (MySqlException)
                 {
-                    Console.WriteLine("Erro: Produto não encontrado para exclusão!");
+                    // O C# segura o erro do MySQL aqui!
+                    Console.WriteLine("\n[ BLOQUEIO DE INTEGRIDADE ]");
+                    Console.WriteLine("Você não pode excluir este produto porque ele já possui movimentações (Entradas/Saídas) no histórico.");
+                    Console.WriteLine("Para manter a auditoria do almoxarifado correta, itens com histórico não podem ser apagados.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"\nErro inesperado ao tentar excluir: {ex.Message}");
                 }
             }
         }

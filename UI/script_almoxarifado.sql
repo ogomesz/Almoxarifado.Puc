@@ -26,7 +26,7 @@ CREATE TABLE Usuario (
 CREATE TABLE Produto (
     codigo_id INT PRIMARY KEY,
     nome_produto VARCHAR(150) NOT NULL,
-    descricao VARCHAR(255), -- NOVA COLUNA AQUI!
+    descricao VARCHAR(255), 
     id_categoria INT,
     id_fornecedor INT,
     quantidade_estoque INT DEFAULT 0,
