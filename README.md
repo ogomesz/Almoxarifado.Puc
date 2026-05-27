@@ -28,8 +28,8 @@ O código segue os princípios de separação de responsabilidades e forte encap
 - **Sessão Protegida**: Vinculação automática do ID do usuário logado a cada movimentação de estoque para fins de auditoria.
 
 ### 📦 Gerenciamento de Estoque (CRUD no Banco de Dados)
-- **Cadastro de Produtos**: Inserção com validação de ID único e integridade referencial com a tabela de categorias.
-- **Busca Avançada**: Consulta rápida de itens por código identificador, realizando junções (`JOIN`) para trazer o nome textual da categoria.
+- **Cadastro de Produtos**: Inserção com validação de ID único, detalhamento customizado via campo de descrição livre e integridade referencial.
+- **Busca Avançada**: Consulta de itens por código identificador, realizando junções (JOIN) para gerar uma ficha técnica completa trazendo a descrição do produto, além do nome.
 - **Listagem Geral**: Relatório instantâneo de todos os produtos do almoxarifado direto do banco de dados.
 - **Exclusão Física**: Remoção de registros do estoque com tratamento no banco.
 
@@ -50,7 +50,7 @@ A base de dados foi mapeada para o modelo físico relacional e conta com 5 tabel
 1. `Categoria`: Organização de grupos de produtos.
 2. `Fornecedor`: Mapeamento dos fornecedores.
 3. `Usuario`: Armazenamento de credenciais e nomes dos operadores.
-4. `Produto`: Registro de itens e saldos.
+4. `Produto`: Registro de itens, descrições detalhadas e saldos.
 5. `Movimentacao`: Histórico detalhado de fluxo do almoxarifado.
 
 ---
