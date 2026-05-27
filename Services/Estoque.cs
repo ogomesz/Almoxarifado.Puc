@@ -30,7 +30,6 @@ internal class Estoque
                 }
             }
 
-            // CORREÇÃO 1: Adicionando 'descricao' na lista de colunas e '@Descricao' nos valores
             string insertSql = "INSERT INTO Produto (codigo_id, nome_produto, descricao, id_categoria, id_fornecedor, quantidade_estoque) " +
                                "VALUES (@CodigoID, @Nome, @Descricao, @Categoria, @Fornecedor, @Quantidade)";
             
@@ -39,7 +38,7 @@ internal class Estoque
                 insertCmd.Parameters.AddWithValue("@CodigoID", p1.CodigoID);
                 insertCmd.Parameters.AddWithValue("@Nome", p1.NomeProduto);
                 
-                // CORREÇÃO 2: Passando o valor da descrição do objeto para o banco de dados
+               
                 insertCmd.Parameters.AddWithValue("@Descricao", p1.Descricao); 
                 
                 insertCmd.Parameters.AddWithValue("@Categoria", int.Parse(p1.Categoria));
@@ -74,7 +73,7 @@ internal class Estoque
                     {
                         if (reader.Read())
                         {
-                            // Usando ToString() para blindar o C# contra valores Nulos antigos do banco!
+                        
                             Produto p = new Produto(
                                 Convert.ToInt32(reader["codigo_id"]),
                                 reader["nome_produto"].ToString(),
@@ -274,7 +273,7 @@ internal class Estoque
         {
             if (con == null) return;
             
-            // Fazemos um JOIN para trazer não só a descrição, mas os nomes da Categoria e Fornecedor
+            
             string sql = @"
                 SELECT p.codigo_id, p.nome_produto, p.descricao, p.quantidade_estoque, 
                        c.nome_categoria, f.nome_fantasia

@@ -4,7 +4,7 @@ using System;
 internal class ConexaoBD
 {
 
-private string stringConexao = "Server=localhost;Port=3306;Database=almoxarifado_db;Uid=root;Pwd=Lilico8346#;";    private MySqlConnection conexao;
+    private string stringConexao = "Server=localhost;Port=3306;Database=almoxarifado_db;Uid=root;Pwd=Lilico8346#;"; private MySqlConnection conexao;
 
     public MySqlConnection Conectar()
     {

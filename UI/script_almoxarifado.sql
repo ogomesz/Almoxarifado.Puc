@@ -45,9 +45,9 @@ CREATE TABLE Movimentacao (
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
 );
 
--- =======================================================
+
 -- 3. MASSA DE DADOS PARA TESTES
--- =======================================================
+
 
 -- Inserindo Categorias Padrão
 INSERT INTO Categoria (nome_categoria) VALUES 

@@ -171,7 +171,6 @@ internal sealed class Almoxarifado
                     Console.Write("Digite o ID do fornecedor: ");
                     string fornecedor = Console.ReadLine();
 
-                    // Agora estamos enviando as 5 informações na ordem correta! A linha vermelha vai sumir.
                     Produto novoProduto = new Produto(id, nome, descricao, categoria, fornecedor);
 
                     Console.WriteLine("");
