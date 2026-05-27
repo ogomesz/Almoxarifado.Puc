@@ -159,7 +159,7 @@ internal sealed class Almoxarifado
                     Console.Write("Digite o nome do produto: ");
                     string nome = Console.ReadLine();
 
-                    // Adicionando a pergunta da Descrição que estava faltando!
+                    
                     Console.Write("Digite uma breve descrição (ex: marca, cor, tamanho): ");
                     string descricao = Console.ReadLine();
 
