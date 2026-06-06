@@ -160,13 +160,8 @@ internal sealed class Almoxarifado
                     Console.Write("Digite o nome do produto: ");
                     string nome = Console.ReadLine();
 
-<<<<<<< HEAD
 
                     Console.Write("Digite uma breve descrição: ");
-=======
-                    
-                    Console.Write("Digite uma breve descrição (ex: marca, cor, tamanho): ");
->>>>>>> 4a4ac1a0872381fcbc5ca08d7bdef0f5598029c8
                     string descricao = Console.ReadLine();
 
                     Console.WriteLine("Categorias: [1] Informática | [2] Papelaria | [3] Limpeza | [4] Operações | [5] Jardinagem");
@@ -255,7 +250,6 @@ internal sealed class Almoxarifado
                     Console.WriteLine("");
                     Console.Write("Digite o ID do Fornecedor que deseja consultar: ");
 
-                    // Blindagem para o sistema não quebrar se o usuário digitar letras
                     if (int.TryParse(Console.ReadLine(), out int idFornecedor))
                     {
                         estoquePuc.BuscarFornecedorPorId(idFornecedor);
@@ -265,7 +259,7 @@ internal sealed class Almoxarifado
                         Console.WriteLine("Por favor, digite um número de ID válido.");
                     }
 
-                    // Pausa a tela para você conseguir ler os dados antes do menu voltar
+                    
                     Console.WriteLine("\nPressione ENTER para voltar ao menu...");
                     Console.ReadLine();
                     break;
