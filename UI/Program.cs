@@ -160,8 +160,13 @@ internal sealed class Almoxarifado
                     Console.Write("Digite o nome do produto: ");
                     string nome = Console.ReadLine();
 
+<<<<<<< HEAD
 
                     Console.Write("Digite uma breve descrição: ");
+=======
+                    
+                    Console.Write("Digite uma breve descrição (ex: marca, cor, tamanho): ");
+>>>>>>> 4a4ac1a0872381fcbc5ca08d7bdef0f5598029c8
                     string descricao = Console.ReadLine();
 
                     Console.WriteLine("Categorias: [1] Informática | [2] Papelaria | [3] Limpeza | [4] Operações | [5] Jardinagem");

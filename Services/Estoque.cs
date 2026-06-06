@@ -192,7 +192,11 @@ internal class Estoque
                 }
                 catch (MySqlException)
                 {
+<<<<<<< HEAD
                     
+=======
+                   
+>>>>>>> 4a4ac1a0872381fcbc5ca08d7bdef0f5598029c8
                     Console.WriteLine("\n[ BLOQUEIO DE INTEGRIDADE ]");
                     Console.WriteLine("Você não pode excluir este produto porque ele já possui movimentações (Entradas/Saídas) no histórico.");
                     Console.WriteLine("Para manter a auditoria do almoxarifado correta, itens com histórico não podem ser apagados.");
