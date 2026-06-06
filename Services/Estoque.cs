@@ -96,6 +96,46 @@ internal class Estoque
         return null;
     }
 
+    public void BuscarFornecedorPorId(int id)
+{
+    using (MySqlConnection con = bd.Conectar())
+    {
+        if (con == null) return;
+
+        string sql = "SELECT id_fornecedor, nome_fantasia, cnpj FROM Fornecedor WHERE id_fornecedor = @id";
+
+        using (MySqlCommand cmd = new MySqlCommand(sql, con))
+        {
+            cmd.Parameters.AddWithValue("@id", id);
+
+            try
+            {
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        Console.WriteLine("\n=========================================");
+                        Console.WriteLine("          FICHA DO FORNECEDOR            ");
+                        Console.WriteLine("=========================================");
+                        Console.WriteLine($"ID do Fornecedor: {reader["id_fornecedor"]}");
+                        Console.WriteLine($"Nome da Empresa:  {reader["nome_fantasia"]}");
+                        Console.WriteLine($"CNPJ Cadastrado:  {reader["cnpj"]}");
+                        Console.WriteLine("=========================================");
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nAviso: Nenhum fornecedor encontrado com este ID.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"\nErro no banco ao tentar buscar o fornecedor: {ex.Message}");
+            }
+        }
+    }
+}
+
     public void LisarTudo()
     {
         using (MySqlConnection con = bd.Conectar())
@@ -152,7 +192,7 @@ internal class Estoque
                 }
                 catch (MySqlException)
                 {
-                    // O C# segura o erro do MySQL aqui!
+                    
                     Console.WriteLine("\n[ BLOQUEIO DE INTEGRIDADE ]");
                     Console.WriteLine("Você não pode excluir este produto porque ele já possui movimentações (Entradas/Saídas) no histórico.");
                     Console.WriteLine("Para manter a auditoria do almoxarifado correta, itens com histórico não podem ser apagados.");

@@ -85,3 +85,96 @@ INSERT INTO Movimentacao (codigo_id, id_usuario, quantidade, tipo, data_hora) VA
 (102, 1, 80, 'ENTRADA', '2026-05-10 09:15:00'),
 (201, 2, 200, 'ENTRADA', '2026-05-11 10:30:00'),
 (101, 2, 5, 'SAIDA', '2026-05-15 14:00:00');
+
+
+SELECT 
+    p.codigo_id, 
+    p.nome_produto, 
+    c.nome_categoria, 
+    f.nome_fantasia, 
+    p.quantidade_estoque
+FROM Produto p
+JOIN Categoria c ON p.id_categoria = c.id_categoria
+JOIN Fornecedor f ON p.id_fornecedor = f.id_fornecedor;
+
+
+SELECT 
+    m.data_hora, 
+    m.tipo, 
+    m.quantidade, 
+    p.nome_produto, 
+    u.nome AS usuario_responsavel
+FROM Movimentacao m
+JOIN Produto p ON m.codigo_id = p.codigo_id
+JOIN Usuario u ON m.id_usuario = u.id_usuario
+ORDER BY m.data_hora DESC;
+
+
+SELECT p.nome_produto 
+FROM Produto p 
+JOIN Movimentacao m ON p.codigo_id = m.codigo_id 
+WHERE m.tipo = 'ENTRADA'
+UNION
+SELECT p.nome_produto 
+FROM Produto p 
+JOIN Movimentacao m ON p.codigo_id = m.codigo_id 
+WHERE m.tipo = 'SAIDA';
+
+
+
+SELECT p.codigo_id, p.nome_produto 
+FROM Produto p 
+JOIN Categoria c ON p.id_categoria = c.id_categoria 
+WHERE c.nome_categoria = 'Informática'
+INTERSECT
+SELECT p.codigo_id, p.nome_produto 
+FROM Produto p 
+JOIN Movimentacao m ON p.codigo_id = m.codigo_id;
+
+
+
+SELECT p.codigo_id, p.nome_produto 
+FROM Produto p 
+JOIN Categoria c ON p.id_categoria = c.id_categoria
+EXCEPT
+SELECT p.codigo_id, p.nome_produto 
+FROM Produto p 
+JOIN Movimentacao m ON p.codigo_id = m.codigo_id;
+
+
+
+SELECT 
+    COUNT(p.codigo_id) AS total_produtos_cadastrados,
+    AVG(p.quantidade_estoque) AS media_itens_por_produto
+FROM Produto p
+JOIN Categoria c ON p.id_categoria = c.id_categoria;
+
+
+
+SELECT 
+    MAX(m.quantidade) AS maior_movimentacao_unica,
+    MIN(m.quantidade) AS menor_movimentacao_unica
+FROM Movimentacao m
+JOIN Usuario u ON m.id_usuario = u.id_usuario;
+
+
+
+SELECT 
+    c.nome_categoria, 
+    COUNT(p.codigo_id) AS total_tipos_produtos
+FROM Categoria c
+JOIN Produto p ON c.id_categoria = p.id_categoria
+GROUP BY c.nome_categoria
+HAVING COUNT(p.codigo_id) > 1;
+
+
+
+SELECT 
+    p.nome_produto, 
+    SUM(m.quantidade) AS total_retirado
+FROM Movimentacao m
+JOIN Produto p ON m.codigo_id = p.codigo_id
+WHERE m.tipo = 'SAIDA'
+GROUP BY p.nome_produto
+HAVING SUM(m.quantidade) > 50;
+

@@ -140,6 +140,7 @@ internal sealed class Almoxarifado
             Console.WriteLine("6 - BUSCAR PRODUTO.");
             Console.WriteLine("7 - EXCLUIR PRODUTO.");
             Console.WriteLine("8 - DETALHES DO PRODUTO");
+            Console.WriteLine("9 - CONSULTAR DETALHES DO FORNECEDOR.");
             Console.WriteLine("0 - SAIR DO SISTEMA.");
             Console.WriteLine("==========================");
 
@@ -151,7 +152,7 @@ internal sealed class Almoxarifado
 
             switch (opcao)
             {
-             case 1:
+                case 1:
                     Console.WriteLine("");
                     Console.Write("Digite o ID do produto: ");
                     int id = int.Parse(Console.ReadLine());
@@ -159,8 +160,8 @@ internal sealed class Almoxarifado
                     Console.Write("Digite o nome do produto: ");
                     string nome = Console.ReadLine();
 
-                    // Adicionando a pergunta da Descrição que estava faltando!
-                    Console.Write("Digite uma breve descrição (ex: marca, cor, tamanho): ");
+
+                    Console.Write("Digite uma breve descrição: ");
                     string descricao = Console.ReadLine();
 
                     Console.WriteLine("Categorias: [1] Informática | [2] Papelaria | [3] Limpeza | [4] Operações | [5] Jardinagem");
@@ -237,15 +238,34 @@ internal sealed class Almoxarifado
                     estoquePuc.ExcluirProduto(idExclusao);
                     break;
 
-                    case 8:
-                        Console.WriteLine("");
-                        Console.Write("Digite o Código ID do Produto que deseja consultar os detalhes: ");
-                        int idDescricao = int.Parse(Console.ReadLine());
-                        
-                        estoquePuc.BuscarProduto(idDescricao);
-                        break;
+                case 8:
+                    Console.WriteLine("");
+                    Console.Write("Digite o Código ID do Produto que deseja consultar os detalhes: ");
+                    int idDescricao = int.Parse(Console.ReadLine());
 
-                
+                    estoquePuc.BuscarProduto(idDescricao);
+                    break;
+
+                case 9:
+                    Console.WriteLine("");
+                    Console.Write("Digite o ID do Fornecedor que deseja consultar: ");
+
+                    // Blindagem para o sistema não quebrar se o usuário digitar letras
+                    if (int.TryParse(Console.ReadLine(), out int idFornecedor))
+                    {
+                        estoquePuc.BuscarFornecedorPorId(idFornecedor);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Por favor, digite um número de ID válido.");
+                    }
+
+                    // Pausa a tela para você conseguir ler os dados antes do menu voltar
+                    Console.WriteLine("\nPressione ENTER para voltar ao menu...");
+                    Console.ReadLine();
+                    break;
+
+
 
                 case 0:
                     Console.WriteLine("");
