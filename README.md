@@ -7,7 +7,7 @@ Este projeto nasceu de uma observação prática no cotidiano de trabalho na PUC
 ## 🚀 Status do Projeto: Partes 1, 2 e 3 Concluídas!
 
 O software evoluiu de um protótipo em memória para uma aplicação de console robusta, com barreira de segurança, tratamento rigoroso de dados e persistência real utilizando banco de dados relacional.
-
+ 
 ---
 
 ## 🏗️ Arquitetura e Organização do Sistema
